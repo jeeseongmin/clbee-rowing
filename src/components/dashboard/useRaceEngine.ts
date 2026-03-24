@@ -2,6 +2,8 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Racer, RankChange } from './types';
 import { MY_ID, RACE_DIST, TICK_MS, BOAT_COLORS, INIT_DATA } from './constants';
 
+export type RacePhase = 'idle' | 'countdown' | 'racing' | 'paused' | 'finished';
+
 function sortRacers(racers: Racer[]): Racer[] {
   const sorted = [...racers].sort((a, b) => b.progress - a.progress);
   sorted.forEach((r, i) => {
@@ -11,25 +13,32 @@ function sortRacers(racers: Racer[]): Racer[] {
   return sorted;
 }
 
-function createInitialRacers(): Racer[] {
-  const racers = INIT_DATA.map((r, i) => ({
+function createIdleRacers(): Racer[] {
+  // All racers start at 0 progress
+  const racers = INIT_DATA.map((r) => ({
     ...r,
-    rank: i + 1,
+    progress: 0,
+    gap: 0,
+    rank: 0,
     bc: BOAT_COLORS[r.id - 1],
     micOn: true,
     camOn: true,
   }));
-  return sortRacers(racers);
+  // Assign initial rank by id order
+  racers.forEach((r, i) => {
+    r.rank = i + 1;
+  });
+  return racers;
 }
 
 export function useRaceEngine() {
-  const [racers, setRacers] = useState<Racer[]>(createInitialRacers);
-  const [elapsed, setElapsed] = useState(132);
-  const [running, setRunning] = useState(true);
+  const [racers, setRacers] = useState<Racer[]>(createIdleRacers);
+  const [elapsed, setElapsed] = useState(0);
+  const [phase, setPhase] = useState<RacePhase>('idle');
   const [rankChanges, setRankChanges] = useState<RankChange>({});
   const [speakingId, setSpeakingId] = useState<number | null>(null);
-  const [finished, setFinished] = useState(false);
   const [winner, setWinner] = useState<Racer | null>(null);
+  const [countdownText, setCountdownText] = useState<string | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const speakIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -68,34 +77,30 @@ export function useRaceEngine() {
         }
       });
       setRankChanges(changes);
-
-      // Clear rank changes after animation
       setTimeout(() => setRankChanges({}), 700);
 
-      // Check finish
       if (sorted.every((r) => r.progress >= RACE_DIST)) {
-        setFinished(true);
+        setPhase('finished');
         setWinner(sorted[0]);
-        // Stop timer will be handled in effect
       }
 
       return sorted;
     });
   }, []);
 
-  // Start/stop race timer
+  // Race timer
   useEffect(() => {
-    if (running && !finished) {
+    if (phase === 'racing') {
       timerRef.current = setInterval(tick, TICK_MS);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [running, finished, tick]);
+  }, [phase, tick]);
 
-  // Speaking indicator cycle
+  // Speaking indicator
   useEffect(() => {
-    if (!running) return;
+    if (phase !== 'racing') return;
     speakIntervalRef.current = setInterval(() => {
       const current = racersRef.current;
       const id = current[Math.floor(Math.random() * current.length)].id;
@@ -105,46 +110,66 @@ export function useRaceEngine() {
     return () => {
       if (speakIntervalRef.current) clearInterval(speakIntervalRef.current);
     };
-  }, [running]);
+  }, [phase]);
 
-  // Stop when finished
-  useEffect(() => {
-    if (finished) {
-      setRunning(false);
-    }
-  }, [finished]);
+  // Countdown sequence: Ready -> 3 -> 2 -> 1 -> Go! -> race
+  const startCountdown = useCallback(() => {
+    setPhase('countdown');
 
-  const pause = useCallback(() => {
-    setRunning(false);
+    const sequence = ['Ready', '3', '2', '1', 'Go!'];
+    let i = 0;
+
+    const showNext = () => {
+      if (i < sequence.length) {
+        setCountdownText(sequence[i]);
+        i++;
+        setTimeout(() => {
+          setCountdownText(null);
+          setTimeout(showNext, 150); // gap between texts
+        }, 700); // display duration
+      } else {
+        // Start racing
+        setPhase('racing');
+      }
+    };
+
+    showNext();
   }, []);
 
+  const pause = useCallback(() => {
+    if (phase === 'racing') setPhase('paused');
+  }, [phase]);
+
   const resume = useCallback(() => {
-    if (!finished) {
-      setRunning(true);
-    }
-  }, [finished]);
+    if (phase === 'paused') setPhase('racing');
+  }, [phase]);
 
   const reset = useCallback(() => {
-    setRacers(createInitialRacers());
-    setElapsed(132);
-    setRunning(true);
+    setRacers(createIdleRacers());
+    setElapsed(0);
+    setPhase('idle');
     setRankChanges({});
     setSpeakingId(null);
-    setFinished(false);
     setWinner(null);
+    setCountdownText(null);
   }, []);
 
   const myRacer = racers.find((r) => r.id === MY_ID) || null;
+  const running = phase === 'racing';
+  const finished = phase === 'finished';
 
   return {
     racers,
     elapsed,
+    phase,
     running,
     rankChanges,
     speakingId,
     finished,
     winner,
     myRacer,
+    countdownText,
+    startCountdown,
     pause,
     resume,
     reset,

@@ -7,17 +7,21 @@ import { ProgressBar } from '../dashboard/ProgressBar';
 import { StatsBar } from '../dashboard/StatsBar';
 import { VideoPanel } from '../dashboard/VideoPanel';
 import { FinishOverlay } from '../dashboard/FinishOverlay';
+import { CountdownOverlay } from '../dashboard/CountdownOverlay';
 import '../../styles/dashboard.css';
 
 export function DashboardScreen() {
   const {
     racers,
     elapsed,
+    phase,
     running,
     rankChanges,
     speakingId,
     finished,
     winner,
+    countdownText,
+    startCountdown,
     pause,
     resume,
     reset,
@@ -47,25 +51,49 @@ export function DashboardScreen() {
 
           {/* Controls */}
           <div className="db-ctrls">
-            <button
-              className="db-cb"
-              onClick={handlePauseResume}
-              title="일시정지/재개"
-            >
-              {running ? '⏸' : '▶️'}
-            </button>
-            <button className="db-cb" onClick={reset} title="다시시작">
-              🔄
-            </button>
-            <button className="db-cb" title="공유">
-              📤
-            </button>
+            {phase === 'idle' ? (
+              <button
+                className="db-cb"
+                onClick={startCountdown}
+                style={{
+                  background: 'linear-gradient(135deg, #00B8FF, #0090CC)',
+                  color: '#fff',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  padding: '8px 28px',
+                  border: 'none',
+                  boxShadow: '0 0 16px rgba(0,184,255,0.3)',
+                }}
+              >
+                🏁 START
+              </button>
+            ) : (
+              <>
+                <button
+                  className="db-cb"
+                  onClick={handlePauseResume}
+                  title="일시정지/재개"
+                  disabled={phase === 'countdown' || finished}
+                >
+                  {running ? '⏸' : '▶️'}
+                </button>
+                <button className="db-cb" onClick={reset} title="다시시작">
+                  🔄
+                </button>
+                <button className="db-cb" title="공유">
+                  📤
+                </button>
+              </>
+            )}
           </div>
         </div>
 
         {/* RIGHT: VIDEO CONFERENCE PANEL */}
         <VideoPanel racers={racers} speakingId={speakingId} />
       </div>
+
+      {/* Countdown overlay */}
+      <CountdownOverlay text={countdownText} />
 
       <FinishOverlay
         visible={finished}
