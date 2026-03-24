@@ -125,9 +125,18 @@ export function RaceTable({ racers, rankChanges }: RaceTableProps) {
                 )}
               </div>
               <div className="db-c-av">
-                <div className="db-avatar" style={avStyle}>
-                  🚣
-                </div>
+                {r.avatar ? (
+                  <img
+                    src={r.avatar}
+                    alt={r.name}
+                    className="db-avatar"
+                    style={{ ...avStyle, objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div className="db-avatar" style={avStyle}>
+                    🚣
+                  </div>
+                )}
               </div>
               <div
                 className="db-c-name"

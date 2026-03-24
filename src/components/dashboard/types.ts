@@ -8,6 +8,7 @@ export interface Racer {
   bc: string;
   micOn: boolean;
   camOn: boolean;
+  avatar: string | null;
 }
 
 export interface RankChange {

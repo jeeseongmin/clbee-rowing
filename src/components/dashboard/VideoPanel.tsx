@@ -132,6 +132,13 @@ export function VideoPanel({ racers, speakingId }: VideoPanelProps) {
                     playsInline
                     muted
                   />
+                ) : r.avatar ? (
+                  <img
+                    src={r.avatar}
+                    alt={r.name}
+                    className="db-vc-cam-video"
+                    style={{ objectFit: 'cover', transform: 'none' }}
+                  />
                 ) : (
                   <div
                     className="db-vc-thumb-bg"
