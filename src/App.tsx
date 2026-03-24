@@ -7,9 +7,9 @@ import { LandingScreen } from './components/screens/LandingScreen';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingScreen />} />
-      <Route path="/main" element={<MainApp />} />
-      <Route path="/dashboard" element={<DashboardScreen />} />
+      <Route path="/board" element={<LandingScreen />} />
+      <Route path="/solo" element={<MainApp />} />
+      <Route path="/game" element={<DashboardScreen />} />
     </Routes>
   );
 }

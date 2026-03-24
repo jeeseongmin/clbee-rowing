@@ -19,14 +19,14 @@ export function LandingScreen() {
         </div>
 
         <div className="space-y-4">
-          <Link to="/main" className="block">
+          <Link to="/solo" className="block">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer group">
               <CardContent className="flex items-center gap-4 py-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 shrink-0">
                   <MonitorPlay className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold">Main — 비디오 플레이어</div>
+                  <div className="font-semibold">Solo — 비디오 플레이어</div>
                   <div className="text-sm text-muted-foreground">
                     로잉 머신 인터벌 운동
                   </div>
@@ -36,14 +36,14 @@ export function LandingScreen() {
             </Card>
           </Link>
 
-          <Link to="/dashboard" className="block">
+          <Link to="/game" className="block">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer group">
               <CardContent className="flex items-center gap-4 py-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-chart-2/10 shrink-0">
                   <Trophy className="h-6 w-6 text-chart-2" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold">Dashboard — 리더보드</div>
+                  <div className="font-semibold">Game — 레이스</div>
                   <div className="text-sm text-muted-foreground">
                     1000M 레이스 실시간 순위
                   </div>
