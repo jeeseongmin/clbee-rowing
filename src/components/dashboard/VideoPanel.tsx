@@ -16,14 +16,16 @@ export function VideoPanel({ racers, speakingId }: VideoPanelProps) {
   // Request camera for ME
   useEffect(() => {
     let cancelled = false;
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: false })
-      .then((s) => {
-        if (!cancelled) setStream(s);
-      })
-      .catch(() => {
-        // Camera not available
-      });
+    if (navigator.mediaDevices?.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: false })
+        .then((s) => {
+          if (!cancelled) setStream(s);
+        })
+        .catch(() => {
+          // Camera not available
+        });
+    }
     return () => {
       cancelled = true;
     };
