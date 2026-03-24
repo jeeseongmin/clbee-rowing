@@ -1,41 +1,20 @@
-import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { Racer } from './types';
 import { MY_ID, RACE_DIST } from './constants';
 
 interface VideoPanelProps {
   racers: Racer[];
   speakingId: number | null;
+  cameraStream: MediaStream | null;
 }
 
-export function VideoPanel({ racers, speakingId }: VideoPanelProps) {
+export function VideoPanel({ racers, speakingId, cameraStream }: VideoPanelProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const prevPositionsRef = useRef<Map<number, DOMRect>>(new Map());
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
 
-  // Request camera for ME
-  useEffect(() => {
-    let cancelled = false;
-    if (navigator.mediaDevices?.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: false })
-        .then((s) => {
-          if (!cancelled) setStream(s);
-        })
-        .catch(() => {
-          // Camera not available
-        });
-    }
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Attach stream to video element via ref callback
   const attachStream = (el: HTMLVideoElement | null) => {
-    videoRef.current = el;
-    if (el && stream && el.srcObject !== stream) {
-      el.srcObject = stream;
+    if (el && cameraStream && el.srcObject !== cameraStream) {
+      el.srcObject = cameraStream;
     }
   };
 
@@ -124,7 +103,7 @@ export function VideoPanel({ racers, speakingId }: VideoPanelProps) {
           return (
             <div className={cardCls} key={r.id} data-vid={r.id}>
               <div className="db-vc-thumb">
-                {isMe && stream ? (
+                {isMe && cameraStream ? (
                   <video
                     ref={attachStream}
                     className="db-vc-cam-video"

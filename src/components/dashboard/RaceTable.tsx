@@ -6,9 +6,10 @@ import { MY_ID, SEGMENTS } from './constants';
 interface RaceTableProps {
   racers: Racer[];
   rankChanges: RankChange;
+  cameraStream: MediaStream | null;
 }
 
-export function RaceTable({ racers, rankChanges }: RaceTableProps) {
+export function RaceTable({ racers, rankChanges, cameraStream }: RaceTableProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const prevPositionsRef = useRef<Map<number, DOMRect>>(new Map());
 
@@ -125,7 +126,18 @@ export function RaceTable({ racers, rankChanges }: RaceTableProps) {
                 )}
               </div>
               <div className="db-c-av">
-                {r.avatar ? (
+                {isMe && cameraStream ? (
+                  <video
+                    ref={(el) => {
+                      if (el && el.srcObject !== cameraStream) el.srcObject = cameraStream;
+                    }}
+                    className="db-avatar"
+                    style={{ ...avStyle, objectFit: 'cover', transform: 'scaleX(-1)' }}
+                    autoPlay
+                    playsInline
+                    muted
+                  />
+                ) : r.avatar ? (
                   <img
                     src={r.avatar}
                     alt={r.name}

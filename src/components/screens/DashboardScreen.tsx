@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRaceEngine } from '../dashboard/useRaceEngine';
+import { useCamera } from '../../hooks/useCamera';
 import { RaceHeader } from '../dashboard/RaceHeader';
 import { TimerStrip } from '../dashboard/TimerStrip';
 import { RaceTable } from '../dashboard/RaceTable';
@@ -27,6 +28,8 @@ export function DashboardScreen() {
     reset,
   } = useRaceEngine();
 
+  const cameraStream = useCamera();
+
   const handlePauseResume = () => {
     if (running) {
       pause();
@@ -41,15 +44,13 @@ export function DashboardScreen() {
       <div className="db-bg-noise" />
 
       <div className="db-app-layout">
-        {/* LEFT: RACE PANEL */}
         <div className="db-race-panel">
           <RaceHeader />
           <TimerStrip elapsed={elapsed} />
-          <RaceTable racers={racers} rankChanges={rankChanges} />
+          <RaceTable racers={racers} rankChanges={rankChanges} cameraStream={cameraStream} />
           <ProgressBar racers={racers} />
           <StatsBar racers={racers} elapsed={elapsed} />
 
-          {/* Controls */}
           <div className="db-ctrls">
             {phase === 'idle' ? (
               <button
@@ -88,11 +89,9 @@ export function DashboardScreen() {
           </div>
         </div>
 
-        {/* RIGHT: VIDEO CONFERENCE PANEL */}
-        <VideoPanel racers={racers} speakingId={speakingId} />
+        <VideoPanel racers={racers} speakingId={speakingId} cameraStream={cameraStream} />
       </div>
 
-      {/* Countdown overlay */}
       <CountdownOverlay text={countdownText} />
 
       <FinishOverlay
