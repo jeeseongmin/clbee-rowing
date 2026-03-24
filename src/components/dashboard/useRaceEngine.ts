@@ -123,12 +123,9 @@ export function useRaceEngine() {
       if (i < sequence.length) {
         setCountdownText(sequence[i]);
         i++;
-        setTimeout(() => {
-          setCountdownText(null);
-          setTimeout(showNext, 150); // gap between texts
-        }, 700); // display duration
+        setTimeout(showNext, 900);
       } else {
-        // Start racing
+        setCountdownText(null);
         setPhase('racing');
       }
     };

@@ -92,7 +92,7 @@ export function DashboardScreen() {
         <VideoPanel racers={racers} speakingId={speakingId} cameraStream={cameraStream} />
       </div>
 
-      <CountdownOverlay text={countdownText} />
+      <CountdownOverlay phase={phase} text={countdownText} />
 
       <FinishOverlay
         visible={finished}
