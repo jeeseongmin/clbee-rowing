@@ -31,12 +31,13 @@ export function VideoPanel({ racers, speakingId }: VideoPanelProps) {
     };
   }, []);
 
-  // Attach stream to video element
-  useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
+  // Attach stream to video element via ref callback
+  const attachStream = (el: HTMLVideoElement | null) => {
+    videoRef.current = el;
+    if (el && stream && el.srcObject !== stream) {
+      el.srcObject = stream;
     }
-  });
+  };
 
   // FLIP animation
   useLayoutEffect(() => {
@@ -125,7 +126,7 @@ export function VideoPanel({ racers, speakingId }: VideoPanelProps) {
               <div className="db-vc-thumb">
                 {isMe && stream ? (
                   <video
-                    ref={isMe ? videoRef : undefined}
+                    ref={attachStream}
                     className="db-vc-cam-video"
                     autoPlay
                     playsInline
