@@ -6,7 +6,7 @@ import './styles/globals.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/rowing">
       <App />
     </BrowserRouter>
   </React.StrictMode>
